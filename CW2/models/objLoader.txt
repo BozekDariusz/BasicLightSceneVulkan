@@ -1,0 +1,92 @@
+void MainWindow::on_actionLoad_Obj_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
+                                                       "C:/Users/Dracops/Desktop/wesola szkola/cloth",
+                                                       tr("OBJ ( *.obj)"));
+   string current_locale_text = fileName.toLocal8Bit().constData();
+       ifstream faceFile;
+       faceFile.open(current_locale_text);
+
+
+             vector<string> v;
+              std::string line;
+              int i=-1;
+
+               if ( faceFile.is_open())
+              {
+                     while (getline(faceFile, line)) {
+                        if(!line.empty()){
+                         v = explode(line, ' ');
+                            }
+                        else{
+                        v[0]="empty";
+                        }
+                         if (!v[0].compare("g")) {
+                             obj temp;
+                           temp.name=line;
+                           getline(faceFile, line);
+                           temp.usemtl=line;
+                           objects->push_back(temp);
+                           i++;
+                         }
+
+                     if (!v[0].compare("v")) {
+                         if(i==-1){
+                             i=0;
+                             obj temp;
+                             objects->push_back(temp);
+
+                         }
+                         tVector3 tempV{stof(v[1]),stof(v[2]),stof(v[3])};
+                            objects[0][i].vertices.push_back(tempV);
+
+
+                     }
+
+
+                     if(!v[0].compare("vt")){
+                            tVector3 tempV{stof(v[1]),stof(v[2]),0};
+                            objects[0][i].verticesTextures.push_back(tempV);
+
+                     }
+                     if(!v[0].compare("vn")){
+                         tVector3 tempV{stof(v[1]),stof(v[2]),stof(v[3])};
+                         objects[0][i].verticesNormals.push_back(tempV);
+                     }
+                     if(!v[0].compare("f")){
+                        vector<string> face1,face2,face3,face4;
+                        face1 = explode(v[1], '/');
+                        face2 = explode(v[2], '/');
+                        face3 = explode(v[3], '/');
+
+
+
+                        tVector3 tempFace1{stof(face1[0]),stof(face2[0]),stof(face3[0])};
+                        tVector3 tempFace2{stof(face1[1]),stof(face2[1]),stof(face3[1])};
+                        tVector3 tempFace3{stof(face1[2]),stof(face2[2]),stof(face3[2])};
+
+                        std::vector<tVector3> face(3);
+                        face[0]=tempFace1;
+                        face[1]=tempFace2;
+                        face[2]=tempFace3;
+                     objects[0][i].faces.push_back(face);
+                        if(v.size()==5){
+                            face4 = explode(v[4], '/');
+
+                            tVector3 tempFace1{stof(face1[0]),stof(face3[0]),stof(face4[0])};
+                            tVector3 tempFace2{stof(face1[1]),stof(face3[1]),stof(face4[1])};
+                            tVector3 tempFace3{stof(face1[2]),stof(face3[2]),stof(face4[2])};
+
+                            std::vector<tVector3> face(3);
+                            face[0]=tempFace1;
+                            face[1]=tempFace2;
+                            face[2]=tempFace3;
+                        objects[0][i].faces.push_back(face);
+                        }
+                     }
+                     }
+
+                     renderWindow->painOBJEvent(objects);
+               }
+
+}

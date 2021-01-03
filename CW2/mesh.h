@@ -9,40 +9,34 @@
 #include "vertex.h"
 #include <string>
 
-struct UniformBufferObject {
+struct UniformBufferObject
+{
 
     glm::mat4 view;
     glm::mat4 proj;
-
-};
-struct UniformBufferModelObject {
-
     glm::mat4 model;
 
 };
+struct LightBufferObject {
+    glm::vec3 lightPos;
+
+};
+
 
 
 struct Mesh {
     //vertices and indices
     std::vector<Vertex> vertices;
-    std::vector<uint16_t> indices;
-    std::vector<VkDescriptorSet> descriptorSets;
-    //uniform buffers storage
-    std::vector<VkBuffer> uniformModelBuffers;
-    //memory for the uniform buffers
-    std::vector<VkDeviceMemory> uniformModelBuffersMemory;
-    glm::vec3 scale;
+    std::vector<uint32_t> indices;
     std::string name;
-    UniformBufferModelObject ubo;
-    glm::vec2 direction;//FIXHERE move to Ball 
+    glm::mat4 model;
     int width;
     int height;
     Mesh() {}
 
-    Mesh(const std::vector<Vertex> v, const std::vector<uint16_t> i) :vertices(v), indices(i) {
+    Mesh(const std::vector<Vertex> v, const std::vector<uint32_t> i) :vertices(v), indices(i) {
 
-        scale = glm::vec3(1.0f, 1.0f, 1.0f);
-        ubo.model = glm::mat4(1);
+        model = glm::mat4(1);
     }
 
 

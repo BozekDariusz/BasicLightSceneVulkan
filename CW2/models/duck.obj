@@ -27038,7 +27038,7 @@ vt 0.5779 0.6691 0.0000
 vt 0.5904 0.6572 0.0000
 # 9582 texture coords
 
-g 12248_Bird_v1																	#Group name
+g Duck															#Group name
 usemtl 12248_Bird_v1															#Specifies the material name for the element following it.
 s 2  																			#group number	#f1 v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3 v4/vt4/vn4  						
 f 1/1/1 2/4801/2 3/2613/3 4/4804/4 												

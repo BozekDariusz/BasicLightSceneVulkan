@@ -3,6 +3,12 @@
 
 layout(binding = 1) uniform sampler2D texSampler;
 
+layout(binding = 2) uniform UniformBufferObject {
+   vec3 pos;
+} light;
+
+
+
 layout(location = 0) in vec2 fragTexCoord;
 layout(location = 1) in vec3 vertPos;
 layout(location = 2) in vec3 normalInterp;
@@ -11,38 +17,44 @@ layout(location = 0) out vec4 outColor;
 
 
 
-/*
-const vec3 lightPos = vec3(1.0, 1.0, 1.0);
+
+
 const vec3 lightColor = vec3(1.0, 1.0, 1.0);
-const float lightPower = 0.5;
-const vec3 ambientColor = vec3(1.0, 1.0, 1.0);
-const vec3 diffuseColor = vec3(1.0 ,1.0, 1.0);
-const vec3 specColor = vec3(0.2880, 0.2880 ,0.2880);
-const float shininess = 0.8;
 
-*/
-void main() {/*
-	  vec3 normal = normalize(normalInterp);
-  vec3 lightDir = lightPos - vertPos;
-  float distance = length(lightDir);
-  distance = distance * distance;
-  lightDir = normalize(lightDir);
-    float lambertian = max(dot(lightDir, normal), 0.0);
-  float specular = 0.0	;
-  vec3 viewDir = normalize(-vertPos);
+const float specularStrength  = 0.5;
+const float ambientStrength = 0.1;
+
+const vec3 viewPos =  vec3(1.0, 1.0, 180.0);
 
 
-       
-  vec3 reflectDir = reflect(-lightDir, normal);
-       float specAngle = max(dot(reflectDir, viewDir), 0.0);
-      specular = pow(specAngle, shininess/28.0000	);
-  vec3 colorLinear = ambientColor* lightColor +diffuseColor * lambertian * lightColor * lightPower / distance
-  +specColor * specular * lightColor * lightPower / distance;
-					 
- */
-    //outColor = vec4(specColor * specular * lightColor * lightPower ,1.0);
-	// outColor = vec4(0.0,0.0,100000.0,1.0);
-outColor = texture(texSampler, fragTexCoord);
+void main() {
+ 
+ 
+ vec3 ambient = ambientStrength * lightColor;
+ 
+ 
+ 
+ vec3 norm = normalize(normalInterp);
+ vec3 lightDir = normalize(light.pos - vertPos);
+ float diff = max(dot(norm,lightDir),0.0);
+ vec3 diffuse = diff * lightColor;
+ vec3 specular = vec3(1);
+ if(diff>0){
+ vec3 viewDir = normalize(viewPos - vertPos);
+ vec3 reflectDir = reflect(-lightDir, norm);
+ float spec = pow(max(dot(viewDir,reflectDir),0.0), 128);
+ specular = specularStrength * spec * lightColor;
+ }
+ 
+ vec4 tex = vec4(0.0,1.0,0.0,1.0);// texture(texSampler, fragTexCoord);
+ vec4 light = vec4((ambient + diffuse + specular), 1.0);
+ 
+ outColor = light * tex;
+ 
+ 
+ 
+ 
+ 
 }
 
 

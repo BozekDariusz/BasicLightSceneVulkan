@@ -7,51 +7,24 @@
 
 
 
+const std::vector<std::string> explode(const std::string& s, const char& c)
+{
+    std::string buff{ "" };
+    std::vector<std::string> v;
+
+    for (auto n : s)
+    {
+        if (n != c) buff += n; else
+            if (n == c && buff != "") { v.push_back(buff); buff = ""; }
+    }
+    if (buff != "") v.push_back(buff);
+
+    return v;
+}
+
+
 void VulkanInfoInstance::loadModel(std::string MODEL_PATH) {
-    /*
-    /////////Not allowed
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string warn, err;
-
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str())) {
-        throw std::runtime_error(warn + err);
-    }
-
-    std::unordered_map<Vertex, uint32_t> uniqueVertices = {};
-
-    for (const auto& shape : shapes) {
-        for (const auto& index : shape.mesh.indices) {
-            Vertex vertex = {};
-
-            vertex.pos = {
-                attrib.vertices[3 * index.vertex_index + 0],
-                attrib.vertices[3 * index.vertex_index + 1],
-                attrib.vertices[3 * index.vertex_index + 2]
-            };
-
-            vertex.texCoord = {
-                attrib.texcoords[2 * index.texcoord_index + 0],
-                1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-            };
-
-            vertex.color = { 1.0f, 1.0f, 1.0f };
-
-            if (uniqueVertices.count(vertex) == 0) {
-                uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-                vertices.push_back(vertex);
-            }
-
-            indices.push_back(uniqueVertices[vertex]);
-        }
-
-
-
-
-    }
-   */
-
+/*
     std::ifstream fin;
     fin.open(MODEL_PATH);
     std::string type;
@@ -170,8 +143,124 @@ void VulkanInfoInstance::loadModel(std::string MODEL_PATH) {
 
     }
 
-    fin.close();
+    Mesh* mesh = new Mesh(); ;
+    mesh->name = "Duck";
+    mesh->vertices = vertices ;
+    mesh->indices = indices ;
+    mesh->model=glm::mat4(1);
 
+    allMeshes.push_back(mesh);
+
+
+
+    fin.close();
+    */
+
+
+   
+std::ifstream fin;
+fin.open(MODEL_PATH);
+
+    std::vector<std::string> v;
+    std::string line;
+    int i = -1;
+    std::vector<glm::vec3> vertPos;
+    std::vector<glm::vec3> vertTex;
+    std::vector<glm::vec3> vertNorm;
+    std::vector<std::vector<glm::vec3>> faces;
+    if (fin.is_open())
+    {
+
+        Mesh* tempM = new Mesh;
+        while (getline(fin, line)) {
+            if (!line.empty()) {
+                v = explode(line, ' ');
+            }
+            else {
+                v[0] = "empty";
+            }
+            if (!v[0].compare("g")) {
+                tempM->name = line;
+                getline(fin, line);
+                i++;
+            }
+
+            if (!v[0].compare("v")) {
+                if (i == -1) {
+                    i = 0;
+
+
+                }
+               vertPos.push_back(glm::vec3 { stof(v[1]),stof(v[2]),stof(v[3]) });
+
+            }
+
+
+            if (!v[0].compare("vt")) {
+                vertTex.push_back(glm::vec3 { stof(v[1]),stof(v[2]),0 });
+
+            }
+            if (!v[0].compare("vn")) {
+               vertNorm.push_back(glm::vec3 { stof(v[1]),stof(v[2]),stof(v[3]) });
+            }
+            if (!v[0].compare("f")) {
+                std::vector<std::string> face1, face2, face3, face4;
+                face1 = explode(v[1], '/');
+                face2 = explode(v[2], '/');
+                face3 = explode(v[3], '/');
+                std::vector<glm::vec3> tempface;
+
+                tempface.push_back(glm::vec3 { stof(face1[0]),stof(face1[1]),stof(face1[2]) });
+                tempface.push_back(glm::vec3 { stof(face2[0]),stof(face2[1]),stof(face2[2]) });
+                tempface.push_back(glm::vec3 { stof(face3[0]),stof(face3[1]),stof(face3[2]) });
+
+                faces.push_back(tempface);
+
+
+               
+                if (v.size() == 5) {
+                    face4 = explode(v[4], '/');
+                    tempface.clear();
+
+                    tempface.push_back(glm::vec3 { stof(face1[0]),stof(face1[1]),stof(face1[2]) });
+                    tempface.push_back(glm::vec3 { stof(face3[0]),stof(face3[1]),stof(face3[2]) });
+                    tempface.push_back(glm::vec3 { stof(face4[0]),stof(face4[1]),stof(face4[2]) });
+
+
+                
+                    faces.push_back(tempface);
+
+                }
+            }
+        }
+        for (auto f : faces) {
+
+            indices.push_back(indices.size() );
+            indices.push_back(indices.size() );
+            indices.push_back(indices.size() );
+
+            tempM->indices.push_back(tempM->indices.size() );
+            tempM->indices.push_back(tempM->indices.size() );
+            tempM->indices.push_back(tempM->indices.size() );
+        }
+
+
+            for (auto f : faces) {
+            for (auto vec : f) {
+
+                Vertex vert;
+                vert.pos = vertPos[vec[0]-1];
+                vert.texCoord = vertTex[vec[1] - 1];
+                vert.normCoord = vertNorm[vec[2] - 1];
+                tempM->vertices.push_back(vert);
+                vertices.push_back(vert);
+            }
+        }
+        tempM->model = glm::scale(glm::mat4(1), glm:: vec3(30));
+        allMeshes.push_back(tempM);
+    
+
+}
 }
 
 

@@ -133,7 +133,16 @@ public:
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
+
+    std::vector<VkBuffer> lightBuffers;
+    std::vector<VkDeviceMemory> lightBuffersMemory;
+
+
     size_t currentFrame = 0;
+
+
+
+    std::vector< Mesh*> allMeshes;
 
     bool framebufferResized = false;
 
@@ -187,6 +196,7 @@ public:
 
     void createIndexBuffer();
     void createUniformBuffers();
+    void createLightBuffer();
     void createBuffer(VkDeviceSize , VkBufferUsageFlags , VkMemoryPropertyFlags , VkBuffer& , VkDeviceMemory& );
 
     void createDepthResources();

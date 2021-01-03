@@ -55,13 +55,21 @@ void VulkanInfoInstance::createIndexBuffer() {
 void VulkanInfoInstance::createUniformBuffers() {
     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
+    VkDeviceSize lightbufferSize = sizeof(LightBufferObject);
+
     uniformBuffers.resize(swapChainImages.size());
     uniformBuffersMemory.resize(swapChainImages.size());
 
+    lightBuffers.resize(swapChainImages.size());
+    lightBuffersMemory.resize(swapChainImages.size());
+
     for (size_t i = 0; i < swapChainImages.size(); i++) {
         createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
+        createBuffer(lightbufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, lightBuffers[i], lightBuffersMemory[i]);
+
     }
 }
+
 
 void VulkanInfoInstance::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
     VkBufferCreateInfo bufferInfo = {};

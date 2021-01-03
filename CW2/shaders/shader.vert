@@ -4,6 +4,7 @@
 layout(binding = 0) uniform UniformBufferObject {
     mat4 view;
     mat4 proj;
+	mat4 model;
 } ubo;
 
 layout(location = 0) in vec3 inPosition;
@@ -16,11 +17,14 @@ layout(location = 1) out vec3 vertPos;
 layout(location = 2) out vec3 normalInterp;
 
 void main() {
-    gl_Position = ubo.proj * ubo.view * vec4(inPosition, 1.0);
-	vec4 vertPos4 = ubo.view * vec4(inPosition, 1.0);
     fragTexCoord = inTexCoord;
-	vertPos = vec3(vertPos4) / vertPos4.w;
-    normalInterp = vec3(inNormCoord);
+	
+	
+	vertPos =  vec3(ubo.model * vec4(inPosition, 1.0));
+    normalInterp = mat3(transpose(inverse(ubo.model))) *inNormCoord;
+	
+	
+    gl_Position = ubo.proj * ubo.view *ubo.model* vec4(inPosition, 1.0);
 }
 
 
